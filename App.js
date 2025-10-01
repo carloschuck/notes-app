@@ -72,6 +72,25 @@ function App() {
     }
   };
 
+  // Toggle todo completion
+  const toggleTodo = async (id) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/notes/${id}/toggle`, {
+        method: 'PATCH',
+      });
+      
+      if (response.ok) {
+        const updatedNote = await response.json();
+        setNotes(prev => prev.map(note => 
+          note.id === id ? updatedNote : note
+        ));
+        setSelectedNote(updatedNote);
+      }
+    } catch (error) {
+      console.error('Error toggling todo:', error);
+    }
+  };
+
   // Delete a note
   const deleteNote = async (id) => {
     try {
@@ -157,6 +176,7 @@ function App() {
               onSave={updateNote}
               onCancel={handleCancel}
               onDelete={deleteNote}
+              onToggleTodo={toggleTodo}
             />
           ) : (
             <div className="welcome">

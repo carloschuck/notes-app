@@ -33,7 +33,16 @@ const NoteList = ({ notes, selectedNote, onNoteSelect, onDeleteNote }) => {
             onClick={() => onNoteSelect(note)}
           >
             <div className="note-item-header">
-              <h3 className="note-title">{note.title}</h3>
+              <div className="note-title-section">
+                {note.isTodo && (
+                  <span className={`todo-indicator ${note.isCompleted ? 'completed' : 'pending'}`}>
+                    {note.isCompleted ? '✓' : '○'}
+                  </span>
+                )}
+                <h3 className={`note-title ${note.isTodo && note.isCompleted ? 'completed' : ''}`}>
+                  {note.title}
+                </h3>
+              </div>
               <button
                 className="delete-btn"
                 onClick={(e) => {

@@ -19,6 +19,8 @@ let notes = [
     id: uuidv4(),
     title: 'Welcome to Notes App',
     content: 'This is your first note! You can edit or delete it.',
+    isTodo: false,
+    isCompleted: false,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }
@@ -42,7 +44,7 @@ app.get('/api/notes/:id', (req, res) => {
 
 // Create a new note
 app.post('/api/notes', (req, res) => {
-  const { title, content } = req.body;
+  const { title, content, isTodo } = req.body;
   
   if (!title || !content) {
     return res.status(400).json({ error: 'Title and content are required' });
@@ -52,6 +54,8 @@ app.post('/api/notes', (req, res) => {
     id: uuidv4(),
     title: title.trim(),
     content: content.trim(),
+    isTodo: Boolean(isTodo),
+    isCompleted: false,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -62,7 +66,7 @@ app.post('/api/notes', (req, res) => {
 
 // Update a note
 app.put('/api/notes/:id', (req, res) => {
-  const { title, content } = req.body;
+  const { title, content, isTodo, isCompleted } = req.body;
   const noteIndex = notes.findIndex(n => n.id === req.params.id);
 
   if (noteIndex === -1) {
@@ -77,6 +81,29 @@ app.put('/api/notes/:id', (req, res) => {
     ...notes[noteIndex],
     title: title.trim(),
     content: content.trim(),
+    isTodo: isTodo !== undefined ? Boolean(isTodo) : notes[noteIndex].isTodo,
+    isCompleted: isCompleted !== undefined ? Boolean(isCompleted) : notes[noteIndex].isCompleted,
+    updatedAt: new Date().toISOString()
+  };
+
+  res.json(notes[noteIndex]);
+});
+
+// Toggle todo completion
+app.patch('/api/notes/:id/toggle', (req, res) => {
+  const noteIndex = notes.findIndex(n => n.id === req.params.id);
+
+  if (noteIndex === -1) {
+    return res.status(404).json({ error: 'Note not found' });
+  }
+
+  if (!notes[noteIndex].isTodo) {
+    return res.status(400).json({ error: 'Note is not a todo item' });
+  }
+
+  notes[noteIndex] = {
+    ...notes[noteIndex],
+    isCompleted: !notes[noteIndex].isCompleted,
     updatedAt: new Date().toISOString()
   };
 

@@ -3,13 +3,15 @@ import React, { useState } from 'react';
 const NoteForm = ({ onSubmit, onCancel }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [isTodo, setIsTodo] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (title.trim() && content.trim()) {
-      onSubmit({ title: title.trim(), content: content.trim() });
+      onSubmit({ title: title.trim(), content: content.trim(), isTodo });
       setTitle('');
       setContent('');
+      setIsTodo(false);
     }
   };
 
@@ -41,6 +43,18 @@ const NoteForm = ({ onSubmit, onCancel }) => {
             placeholder="Write your note here..."
             required
           />
+        </div>
+
+        <div className="form-group">
+          <label className="form-checkbox-label">
+            <input
+              type="checkbox"
+              className="form-checkbox"
+              checked={isTodo}
+              onChange={(e) => setIsTodo(e.target.checked)}
+            />
+            <span className="form-checkbox-text">Create as a to-do item</span>
+          </label>
         </div>
         
         <div className="form-actions">
