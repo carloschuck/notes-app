@@ -398,6 +398,82 @@
   margin-top: 0.5rem;
 }
 
+/* Category Styles */
+.form-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(40, 40, 60, 0.8);
+  color: #ffffff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #4CAF50;
+  background: rgba(50, 50, 70, 0.9);
+}
+
+.form-select option {
+  background: rgba(40, 40, 60, 0.9);
+  color: #ffffff;
+}
+
+.category-filter {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.category-select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  background: rgba(30, 30, 46, 0.8);
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.category-select:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.category-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.category-indicator {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.note-item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.note-category {
+  margin-top: 0.5rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .app-content {

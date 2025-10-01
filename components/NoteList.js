@@ -1,6 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const NoteList = ({ notes, selectedNote, onNoteSelect, onDeleteNote }) => {
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories');
+      if (response.ok) {
+        const categoriesData = await response.json();
+        setCategories(categoriesData);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -19,14 +38,37 @@ const NoteList = ({ notes, selectedNote, onNoteSelect, onDeleteNote }) => {
     return content.length > 100 ? content.substring(0, 100) + '...' : content;
   };
 
+  const getCategoryInfo = (categoryId) => {
+    return categories.find(cat => cat.id === categoryId) || { name: 'General', color: '#4CAF50' };
+  };
+
+  const filteredNotes = selectedCategory === 'all' 
+    ? notes 
+    : notes.filter(note => note.categoryId === selectedCategory);
+
   return (
     <div className="note-list">
-      {notes.length === 0 ? (
+      <div className="category-filter">
+        <select 
+          className="category-select"
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+        >
+          <option value="all">All Categories</option>
+          {categories.map(category => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      
+      {filteredNotes.length === 0 ? (
         <div style={{ color: 'rgba(255, 255, 255, 0.7)', textAlign: 'center', padding: '2rem' }}>
-          No notes yet. Create your first note!
+          {selectedCategory === 'all' ? 'No notes yet. Create your first note!' : 'No notes in this category.'}
         </div>
       ) : (
-        notes.map(note => (
+        filteredNotes.map(note => (
           <div
             key={note.id}
             className={`note-item ${selectedNote && selectedNote.id === note.id ? 'selected' : ''}`}
@@ -56,7 +98,15 @@ const NoteList = ({ notes, selectedNote, onNoteSelect, onDeleteNote }) => {
               </button>
             </div>
             <p className="note-preview">{getPreview(note.content)}</p>
-            <div className="note-date">{formatDate(note.updatedAt)}</div>
+            <div className="note-item-footer">
+              <div className="note-date">{formatDate(note.updatedAt)}</div>
+              <span 
+                className="category-indicator" 
+                style={{ backgroundColor: getCategoryInfo(note.categoryId).color }}
+              >
+                {getCategoryInfo(note.categoryId).name}
+              </span>
+            </div>
           </div>
         ))
       )}

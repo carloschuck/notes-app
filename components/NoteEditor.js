@@ -4,16 +4,32 @@ const NoteEditor = ({ note, isEditing, onEdit, onSave, onCancel, onDelete, onTog
   const [title, setTitle] = useState(note.title);
   const [content, setContent] = useState(note.content);
   const [isTodo, setIsTodo] = useState(note.isTodo || false);
+  const [categoryId, setCategoryId] = useState(note.categoryId || 'general');
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     setTitle(note.title);
     setContent(note.content);
     setIsTodo(note.isTodo || false);
+    setCategoryId(note.categoryId || 'general');
+    fetchCategories();
   }, [note]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories');
+      if (response.ok) {
+        const categoriesData = await response.json();
+        setCategories(categoriesData);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const handleSave = () => {
     if (title.trim() && content.trim()) {
-      onSave(note.id, { title: title.trim(), content: content.trim(), isTodo });
+      onSave(note.id, { title: title.trim(), content: content.trim(), isTodo, categoryId });
     }
   };
 
@@ -32,6 +48,10 @@ const NoteEditor = ({ note, isEditing, onEdit, onSave, onCancel, onDelete, onTog
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleString();
+  };
+
+  const getCategoryInfo = (categoryId) => {
+    return categories.find(cat => cat.id === categoryId) || { name: 'General', color: '#4CAF50' };
   };
 
   return (
@@ -99,6 +119,22 @@ const NoteEditor = ({ note, isEditing, onEdit, onSave, onCancel, onDelete, onTog
           </div>
 
           <div className="form-group">
+            <label className="form-label" htmlFor="edit-category">Category</label>
+            <select
+              id="edit-category"
+              className="form-select"
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+            >
+              {categories.map(category => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
             <label className="form-checkbox-label">
               <input
                 type="checkbox"
@@ -118,6 +154,14 @@ const NoteEditor = ({ note, isEditing, onEdit, onSave, onCancel, onDelete, onTog
           <div className="note-meta">
             <div>Created: {formatDate(note.createdAt)}</div>
             <div>Last updated: {formatDate(note.updatedAt)}</div>
+            <div className="note-category">
+              <span 
+                className="category-badge" 
+                style={{ backgroundColor: getCategoryInfo(note.categoryId).color }}
+              >
+                {getCategoryInfo(note.categoryId).name}
+              </span>
+            </div>
             {note.isTodo && (
               <div className="todo-status">
                 Status: {note.isCompleted ? '✅ Completed' : '⏳ Pending'}

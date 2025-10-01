@@ -1,17 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const NoteForm = ({ onSubmit, onCancel }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isTodo, setIsTodo] = useState(false);
+  const [categoryId, setCategoryId] = useState('general');
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories');
+      if (response.ok) {
+        const categoriesData = await response.json();
+        setCategories(categoriesData);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (title.trim() && content.trim()) {
-      onSubmit({ title: title.trim(), content: content.trim(), isTodo });
+      onSubmit({ title: title.trim(), content: content.trim(), isTodo, categoryId });
       setTitle('');
       setContent('');
       setIsTodo(false);
+      setCategoryId('general');
     }
   };
 
@@ -43,6 +62,22 @@ const NoteForm = ({ onSubmit, onCancel }) => {
             placeholder="Write your note here..."
             required
           />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label" htmlFor="category">Category</label>
+          <select
+            id="category"
+            className="form-select"
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+          >
+            {categories.map(category => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="form-group">
